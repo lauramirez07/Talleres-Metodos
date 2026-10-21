@@ -28,3 +28,10 @@ def biseccion(a, b, tolerancia=1e-12):
     return (a + b) / 2
 
 
+raiz1 = biseccion(-1, 0)
+raiz2 = biseccion(1, 1.5)
+
+print(f"Primera raíz: {raiz1:.4f}")
+print(f"Segunda raíz: {raiz2:.4f}")
+
+
