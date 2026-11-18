@@ -1,77 +1,69 @@
-"""Diferencias finitas para f(x) = (tan(x))**ln(x) + x**4.
+import math
 
-Metodos 1 y 2 de las formulas de clase para la primera derivada.
-Se trabaja en radianes y la funcion real requiere x > 0 y tan(x) > 0.
-"""
+# 1. Definimos la funcion f(x) = (tan(x))^ln(x) + x^4
+def f(x):
+    return (math.tan(x) ** math.log(x)) + (x ** 4)
 
-from math import cos, log, sin, tan
+# 2. Datos del problema
+xi = 1
+h = 0.1
+valor = 15       
+valor_real = 4.443023      # Derivada analitica real en xi = 1
+error_max = 0.7
 
+# 3. Calculo de las derivadas
+adelante_1 = (f(xi + h) - f(xi)) / h
+adelante_2 = (-f(xi + 2*h) + 4*f(xi + h) - 3*f(xi)) / (2*h)
 
-def f(x: float) -> float:
-    tangente = tan(x)
-    if x <= 0 or tangente <= 0:
-        raise ValueError("Se requiere x > 0 y tan(x) > 0 para valores reales.")
-    return tangente ** log(x) + x**4
+atras_1 = (f(xi) - f(xi - h)) / h
+atras_2 = (3*f(xi) - 4*f(xi - h) + f(xi - 2*h)) / (2*h)
 
+centrada_1 = (f(xi + h) - f(xi - h)) / (2*h)
+centrada_2 = (-f(xi + 2*h) + 8*f(xi + h) - 8*f(xi - h) + f(xi - 2*h)) / (12*h)
 
-def derivada_analitica(x: float) -> float:
-    tangente = tan(x)
-    if x <= 0 or tangente <= 0:
-        raise ValueError("Se requiere x > 0 y tan(x) > 0 para valores reales.")
-    potencia = tangente ** log(x)
-    return potencia * (log(tangente) / x + log(x) / (sin(x) * cos(x))) + 4 * x**3
+# 4. Calculo de los 3 errores para cada metodo
+# Error 1: Absoluto 
+e15_ad1 = abs(valor - adelante_1)
+e15_ad2 = abs(valor - adelante_2)
+e15_at1 = abs(valor - atras_1)
+e15_at2 = abs(valor - atras_2)
+e15_ce1 = abs(valor - centrada_1)
+e15_ce2 = abs(valor - centrada_2)
 
+# Error 2: Absoluto 
+ereal_ad1 = abs(valor_real - adelante_1)
+ereal_ad2 = abs(valor_real - adelante_2)
+ereal_at1 = abs(valor_real - atras_1)
+ereal_at2 = abs(valor_real - atras_2)
+ereal_ce1 = abs(valor_real - centrada_1)
+ereal_ce2 = abs(valor_real - centrada_2)
 
-def adelante_metodo_1(x: float, h: float) -> float:
-    return (f(x + h) - f(x)) / h
+# Error 3: Relativo porcentual 
+erel_ad1 = (ereal_ad1 / valor_real) * 100
+erel_ad2 = (ereal_ad2 / valor_real) * 100
+erel_at1 = (ereal_at1 / valor_real) * 100
+erel_at2 = (ereal_at2 / valor_real) * 100
+erel_ce1 = (ereal_ce1 / valor_real) * 100
+erel_ce2 = (ereal_ce2 / valor_real) * 100
 
-
-def adelante_metodo_2(x: float, h: float) -> float:
-    return (-f(x + 2 * h) + 4 * f(x + h) - 3 * f(x)) / (2 * h)
-
-
-def atras_metodo_1(x: float, h: float) -> float:
-    return (f(x) - f(x - h)) / h
-
-
-def atras_metodo_2(x: float, h: float) -> float:
-    return (3 * f(x) - 4 * f(x - h) + f(x - 2 * h)) / (2 * h)
-
-
-def centrada_metodo_1(x: float, h: float) -> float:
-    return (f(x + h) - f(x - h)) / (2 * h)
-
-
-def centrada_metodo_2(x: float, h: float) -> float:
-    return (-f(x + 2 * h) + 8 * f(x + h) - 8 * f(x - h) + f(x - 2 * h)) / (12 * h)
-
-
-def main() -> None:
-    xi = 1.0
-    h = 0.1
-    valor_verdadero = 15.0
-    error_maximo = 0.7
-
-    metodos = {
-        "Adelante, metodo 1": adelante_metodo_1,
-        "Adelante, metodo 2": adelante_metodo_2,
-        "Atras, metodo 1": atras_metodo_1,
-        "Atras, metodo 2": atras_metodo_2,
-        "Centrada, metodo 1": centrada_metodo_1,
-        "Centrada, metodo 2": centrada_metodo_2,
-    }
-
-    print("f(x) = (tan(x))**ln(x) + x**4")
-    print(f"xi = {xi}, h = {h}, valor verdadero indicado = {valor_verdadero}")
-    print(f"Derivada analitica en xi: {derivada_analitica(xi):.6f}")
-    print(f"Error maximo permitido: {error_maximo}\n")
-
-    for nombre, metodo in metodos.items():
-        aproximacion = metodo(xi, h)
-        error = abs(valor_verdadero - aproximacion)
-        cumple = "Si" if error < error_maximo else "No"
-        print(f"{nombre:21s}: {aproximacion:.6f} | error vs. 15 = {error:.6f} | cumple: {cumple}")
+# 5. Mostrar resultados con los 3 errores
+print("Adelante 1:", round(adelante_1, 4), "| Err vs 15:", round(e15_ad1, 4), "| Err Abs Real:", round(ereal_ad1, 4), "| Err Rel %:", round(erel_ad1, 4))
+print("Adelante 2:", round(adelante_2, 4), "| Err vs 15:", round(e15_ad2, 4), "| Err Abs Real:", round(ereal_ad2, 4), "| Err Rel %:", round(erel_ad2, 4))
+print("Atras 1:   ", round(atras_1, 4),    "| Err vs 15:", round(e15_at1, 4), "| Err Abs Real:", round(ereal_at1, 4), "| Err Rel %:", round(erel_at1, 4))
+print("Atras 2:   ", round(atras_2, 4),    "| Err vs 15:", round(e15_at2, 4), "| Err Abs Real:", round(ereal_at2, 4), "| Err Rel %:", round(erel_at2, 4))
+print("Centrada 1:", round(centrada_1, 4), "| Err vs 15:", round(e15_ce1, 4), "| Err Abs Real:", round(ereal_ce1, 4), "| Err Rel %:", round(erel_ce1, 4))
+print("Centrada 2:", round(centrada_2, 4), "| Err vs 15:", round(e15_ce2, 4), "| Err Abs Real:", round(ereal_ce2, 4), "| Err Rel %:", round(erel_ce2, 4))
 
 
-if __name__ == "__main__":
-    main()
+if erel_ad1 < error_max:
+    print("- Adelante, metodo 1")
+if erel_ad2 < error_max:
+    print("- Adelante, metodo 2")
+if erel_at1 < error_max:
+    print("- Atras, metodo 1")
+if erel_at2 < error_max:
+    print("- Atras, metodo 2")
+if erel_ce1 < error_max:
+    print("- Centrada, metodo 1")
+if erel_ce2 < error_max:
+    print("- Centrada, metodo 2")
